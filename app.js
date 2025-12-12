@@ -1,12 +1,11 @@
-// ok
-// applicazione si occupa di creare la sessione, mettere il secret nella sessione, i cookie, ecc
+// Applicazione si occupa di creare la sessione, mettere il secret nella sessione, i cookie, ecc
 // NB: errori di accesso o autorizzazione possono essere legati ai cors, che gestiscono le chiamate multi-sito
-
 import express from 'express';
 import cors from 'cors';
 import passport from 'passport';
 import session from 'express-session'; // Import necessario per la gestione della sessione
 import { api as apiRouter } from './server/api/index.js'; // Importiamo il router principale aggregato
+import 'dotenv/config';
 
 /**
  * Funzione che crea e configura l'istanza dell'applicazione Express.
@@ -25,7 +24,7 @@ export function createApp() {
 
     // Configurazione della sessione
     app.use(session({
-        secret: process.env.SESSION_SECRET || 'BUY7tuy876Y4s6sidjVY6DUFGVb892r3F6IDTUgf',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {

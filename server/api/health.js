@@ -1,6 +1,4 @@
-// ok
-// verifica se il server sta bene
-
+// verifica lo stato del server
 import { Router } from 'express';
 
 // Crea un'istanza di Router Express specifica per l'health check

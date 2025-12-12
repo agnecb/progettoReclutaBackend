@@ -2,42 +2,21 @@
 
 import { Router } from 'express';
 import { supabase } from '../db/index.js';
-import bcrypt from 'bcrypt'; // Necessario per hashing
 import { authenticateJWT } from '../auth/passport.js'; // Middleware di protezione JWT
+import { requireFields, paginated } from '../utils.js';
 
-// Costante per l'hashing della password
-const SALT_ROUNDS = 10;
 
 // Campi da selezionare pubblicamente (escludiamo password_hash e dati sensibili - salt, otp_secret)
 const USER_SELECT_FIELDS = 'id, username, email, bio, created_at';
 
 const router = Router();
 
-// Valida la presenza dei campi obbligatori nel corpo della richiesta.
-const requireFields = (obj, fields) => {
-    const missing = fields.filter(f => obj?.[f] == null || obj[f] === '');
-    if (missing.length) {
-        const err = new Error(`Missing fields: ${missing.join(', ')}`);
-        err.status = 400;
-        throw err;
-    }
-};
-
-// Calcola i parametri di paginazione (limit e offset).
-const paginated = (req) => {
-    const limit = Math.min(parseInt(req.query.limit ?? '20', 10), 100);
-    const offset = Math.max(parseInt(req.query.offset ?? '0', 10), 0);
-    return { limit, offset };
-}
-
 
 /* ROTTE */
 
-// GET /users?limit=&offset=&q=
+// GET /users?limit=&offset=&q= (Lista Utenti)
 // --> Paginazione
-// --> Se q presente → filtro su username o email (usa .or(...) di Supabase).
-// 1. GET /users?limit=&offset=&q= (Lista Utenti)
-// Paginazione e filtro su username o email.
+// --> Se q presente --> filtro su username o email (usa .or(...) di Supabase).
 router.get('/', async (req, res, next) => {
     try {
         const { limit, offset } = paginated(req);
@@ -46,7 +25,7 @@ router.get('/', async (req, res, next) => {
         let query = supabase
             .from('users')
             .select(USER_SELECT_FIELDS, { count: 'exact' });
-        
+
         // Filtro di ricerca (q)
         if (q) {
             // Filtra su username O email (usando .ilike per case-insensitive)
@@ -71,7 +50,7 @@ router.get('/', async (req, res, next) => {
 });
 
 
-// GET /users/:id → singolo utente.
+// GET /users/:id --> singolo utente.
 router.get('/:id', async (req, res, next) => {
     try {
         const userId = req.params.id;
@@ -103,25 +82,13 @@ router.get('/:id', async (req, res, next) => {
     }
 });
 
-// POST /users → crea utente (richiede username, email, password_hash) --> NON viene usata, la creazione di un profilo avviene tramite autenticazione (vedi auth.js)
+// POST /users --> crea utente (richiede username, email, password_hash) --> NON viene usata, la creazione di un profilo avviene tramite autenticazione (vedi auth.js)
 router.post('/', async (req, res, next) => {
-    try {
-        // Validazione
-        requireFields(req.body, ['username', 'email', 'password']);
-        const { username, email, password } = req.body;
-
-        // Hash della password
-        const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-
-        // Inserimento --> no
-
-    } catch (err) {
-        next(err);
-    }
+    res.status(403).json({ message: "Creazione utente non consentita qui. Usa /auth/register" });
 });
 
 
-// PATCH /users/:id → aggiorna campi presenti nel body (username, bio) - Protetta da JWT
+// PATCH /users/:id --> aggiorna campi presenti nel body (username, bio) - Protetta da JWT
 router.patch('/:id', authenticateJWT, async (req, res, next) => {
     try {
         const userIdToUpdate = req.params.id;
@@ -165,8 +132,6 @@ router.patch('/:id', authenticateJWT, async (req, res, next) => {
         }
 
         res.status(200).json({
-            // Lo Swagger /users/{id} PATCH ritorna il solo oggetto 'User' aggiornato
-            // L'oggetto 'User' in questo file è la radice della risposta.
             id: updatedUser.id,
             username: updatedUser.username,
             email: updatedUser.email,
@@ -181,18 +146,18 @@ router.patch('/:id', authenticateJWT, async (req, res, next) => {
 });
 
 
-// DELETE /users/:id → cancella utente - Protetta da JWT
+// DELETE /users/:id --> cancella utente - Protetta da JWT
 router.delete('/:id', authenticateJWT, async (req, res, next) => {
     try {
         const userIdToDelete = req.params.id;
         const requestingUserId = req.user.id;
 
         // Controllo di Autorizzazione: solo l'utente stesso può cancellare
-        if (userIdToDelete !== requestingUserId) {
+        if (String(userIdToUpdate) !== String(requestingUserId)) {
             return res.status(403).json({ error: 'Non sei autorizzato a cancellare questo profilo.' });
         }
 
-        // Esegue la cancellazione --> devo mettere on delete cascade così da eliminare anche i record delle altre tabelle in cui è chiave esterna
+        // Esegue la cancellazione 
         const { error: deleteError } = await supabase
             .from('users')
             .delete()

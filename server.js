@@ -1,5 +1,4 @@
-// ok
-// configura la porta, crea l'applicazione e ascolta il local host (app.listen)
+// Configura la porta, crea l'applicazione e ascolta il local host (app.listen)
 import 'dotenv/config';
 
 import { createApp } from './app.js';

@@ -170,8 +170,4 @@ router.delete('/:id', authenticateJWT, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-
-
-
-// Esportazione predefinita del router
 export default router;

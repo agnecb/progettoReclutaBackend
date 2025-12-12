@@ -1,11 +1,9 @@
-// ok
-// autenticazione
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { supabase } from '../db/index.js'; // Importiamo il client Supabase
 
 // La chiave segreta per la firma del JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'CYUfyitxrI576UFYDi6ukyfjcdY8V7IUByvu4SDr2rdc75ituvyctxRZEurytdCi';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**
  * Funzione che inizializza la strategia JWT per Passport.

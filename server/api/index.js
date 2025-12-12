@@ -1,9 +1,7 @@
-// ok
 // Mega router con all'interno i sotto router
 // --> i file js contengono la logica delle routes, poi vengono montate qui nel router e verranno esposte queste routes
 import { Router } from 'express';
 
-// Importazione dei sotto-router (che implementeremo nei prossimi passi)
 import authRouter from './auth.js'; 
 import healthRouter from './health.js';
 import usersRouter from './users.js';

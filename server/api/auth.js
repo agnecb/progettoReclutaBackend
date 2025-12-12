@@ -1,12 +1,8 @@
-// ok?
-
-/*
-Ogni endpoint usa:
+/* Ogni endpoint usa:
  - supabase per leggere/scrivere utenti
  - bcrypt per hash password
  - jwt per generare token
  - speakeasy per OTP
-
 */
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
@@ -18,7 +14,7 @@ import { supabase } from '../db/index.js';
 // creo il router per gestire le varie rotte
 const router = Router();
 // secret del JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'CYUfyitxrI576UFYDi6ukyfjcdY';
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '24h';
 
 // middleware per verificare il token
@@ -36,7 +32,7 @@ router.post('/register', async (req, res, next) => {
         const { data: existingUser } = await supabase
             .from('users')
             .select('*')
-            .or(`email.eq.${email},username.eq.${username}`)   // ← CORRETTO
+            .or(`email.eq.${email},username.eq.${username}`) 
             .single();
 
         if (existingUser) {
@@ -112,7 +108,7 @@ router.post('/login', async (req, res, next) => {
             return res.status(401).json({ error: 'Credenziali non valide' });
         }
 
-        // Se l'utente ha OTP configurato  → richiediamo verifica OTP 
+        // Se l'utente ha OTP configurato --> richiediamo verifica OTP 
         if (user.otp_secret) {
             // Genera un token temporaneo per il secondo step
             const tempToken = jwt.sign(
