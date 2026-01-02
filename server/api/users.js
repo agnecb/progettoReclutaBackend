@@ -104,7 +104,8 @@ router.patch('/:id', authenticateJWT, async (req, res, next) => {
 
         // Filtra solo i campi che possono essere aggiornati e prepara l'oggetto
         if (updateData.username) dataToUpdate.username = updateData.username;
-        if (updateData.bio) dataToUpdate.bio = updateData.bio;
+        //if (updateData.bio) dataToUpdate.bio = updateData.bio; --> non permette di cancellare la bio
+        if (updateData.bio != undefined) dataToUpdate.bio = updateData.bio;
 
         if (Object.keys(dataToUpdate).length === 0) {
             return res.status(400).json({ error: 'Nessun campo valido fornito per l\'aggiornamento.' });

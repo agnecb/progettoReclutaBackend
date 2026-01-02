@@ -20,7 +20,7 @@ export function createApp() {
     app.use(express.urlencoded({ extended: true }));
 
     // Logging delle variabili d'ambiente (per debug)
-    console.log('SUPABASE_URL ->', process.env.SUPABASE_SERVICE_ROLE_KEY || '{non impostata}');
+    console.log('SUPABASE_URL ->', process.env.SUPABASE_URL || '{non impostata}');
 
     // Configurazione della sessione
     app.use(session({

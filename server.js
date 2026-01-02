@@ -5,6 +5,6 @@ import { createApp } from './app.js';
 const PORT = Number(process.env.PORT || 4000); // Uso PORT, ma 4000 è un buon default
 const app = createApp();
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on http://localhost:${PORT}`)
 })
